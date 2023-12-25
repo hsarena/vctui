@@ -25,16 +25,16 @@ type vcInternal struct {
 	resourcePool  *object.ResourcePool
 }
 
-func (i *vcInternal) parseInternals(c *govmomi.Client) error {
+func (i *vcInternal) parseInternals(c *govmomi.Client, dcName string) error {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// Create a new finder that will discover the defaults and are looked for Networks/Datastores
 	f := find.NewFinder(c.Client, true)
-
+	fmt.Println(f.DatastoreList(ctx,"*"))
 	// Find one and only datacenter, not sure how VMware linked mode will work
-	dc, err := f.DatacenterOrDefault(ctx, "")
+	dc, err := f.DatacenterOrDefault(ctx, dcName)
 	if err != nil {
 		return fmt.Errorf("No Datacenter instance could be found inside of vCenter %v", err)
 	}
@@ -124,7 +124,7 @@ func hostInventory(c *govmomi.Client) (hss []mo.HostSystem, err error) {
 }
 
 //VMInventory will create an inventory
-func VMInventory(c *govmomi.Client, sortVMs bool) ([]*object.VirtualMachine, error) {
+func VMInventory(c *govmomi.Client, dcName string, sortVMs bool) ([]*object.VirtualMachine, error) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -133,7 +133,7 @@ func VMInventory(c *govmomi.Client, sortVMs bool) ([]*object.VirtualMachine, err
 	f := find.NewFinder(c.Client, true)
 
 	// Find one and only datacenter, not sure how VMware linked mode will work
-	dc, err := f.DatacenterOrDefault(ctx, "")
+	dc, err := f.DatacenterOrDefault(ctx, dcName)
 	if err != nil {
 		return nil, fmt.Errorf("No Datacenter instance could be found inside of vCenter %v", err)
 	}

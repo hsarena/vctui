@@ -13,7 +13,7 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
-func newVM(c *govmomi.Client) *types.VirtualMachineConfigSpec {
+func newVM(c *govmomi.Client, dcName string) *types.VirtualMachineConfigSpec {
 	uiBugFix()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -135,7 +135,7 @@ func newVM(c *govmomi.Client) *types.VirtualMachineConfigSpec {
 		findDataStore: datastore,
 		findHost:      host,
 	}
-	err = i.parseInternals(c)
+	err = i.parseInternals(c, dcName)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}

@@ -17,7 +17,7 @@ import (
 var searchString string
 
 //MainUI starts up the katbox User Interface
-func MainUI(v []*object.VirtualMachine, c *govmomi.Client) error {
+func MainUI(v []*object.VirtualMachine, dcName string, c *govmomi.Client) error {
 	// Check for a nil pointer
 	if v == nil {
 		return fmt.Errorf("No VMs")
@@ -114,7 +114,7 @@ func MainUI(v []*object.VirtualMachine, c *govmomi.Client) error {
 			if r.objectType == "template" {
 				application.Suspend(func() { newVMFromTemplate(tree.GetCurrentNode().GetText()) })
 			} else {
-				application.Suspend(func() { newVM(c) })
+				application.Suspend(func() { newVM(c, dcName) })
 			}
 			uiBugFix()
 		case tcell.KeyCtrlP:
@@ -225,7 +225,7 @@ func MainUI(v []*object.VirtualMachine, c *govmomi.Client) error {
 			}
 		case tcell.KeyCtrlR:
 			// Refresh Virtual Machines
-			v, err := VMInventory(c, true)
+			v, err := VMInventory(c, dcName, true)
 			if err != nil {
 				// Throw Error UI
 				application.Suspend(func() { errorUI(err) })
